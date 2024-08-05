@@ -3,8 +3,8 @@ FROM php:7.2-apache
 
 ENV ACCEPT_EULA=Y
 
-#Install required packages for SQL Server package Driver
-RUN apt-get update && apt-get install -y gnupg2
+#Install required packages for SQL Server package Driver AND Print PDF function ( wkhtmltopdf )
+RUN apt-get update && apt-get install -y gnupg2 wkhtmltopdf
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
 RUN curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list
 RUN apt-get update
@@ -23,3 +23,10 @@ RUN docker-php-ext-install mysqli pdo pdo_mysql
 
 # Set the working directory to /var/www/html
 WORKDIR /var/www/html
+
+# Create Container User with locahost`s UID and GID 
+RUN addgroup --gid 1000 dockeruser
+RUN adduser --gid 1000 --system --disabled-password --shell /bin/sh --uid 1000 dockeruser
+
+# Change Container to Newly created User
+USER dockeruser
